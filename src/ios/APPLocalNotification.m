@@ -492,9 +492,12 @@ UNNotificationPresentationOptions const OptionAlert = UNNotificationPresentation
 {
     UNNotificationRequest* toast = notification.request;
 
-    [_delegate userNotificationCenter:center
+    if (_delegate != nil && ![toast.trigger isKindOfClass:UNCalendarNotificationTrigger.class]) {
+        [_delegate userNotificationCenter:center
               willPresentNotification:notification
                 withCompletionHandler:handler];
+        return;
+    }
 
     if ([toast.trigger isKindOfClass:UNPushNotificationTrigger.class])
         return;
@@ -524,9 +527,12 @@ UNNotificationPresentationOptions const OptionAlert = UNNotificationPresentation
 {
     UNNotificationRequest* toast = response.notification.request;
 
-    [_delegate userNotificationCenter:center
-       didReceiveNotificationResponse:response
-                withCompletionHandler:handler];
+    if (_delegate != nil && ![toast.trigger isKindOfClass:UNCalendarNotificationTrigger.class]) {
+        [_delegate userNotificationCenter:center
+           didReceiveNotificationResponse:response
+                    withCompletionHandler:handler];
+        return;
+    }
 
     handler();
 
