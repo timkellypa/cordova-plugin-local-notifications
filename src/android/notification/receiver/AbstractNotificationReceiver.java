@@ -40,13 +40,6 @@ abstract public class AbstractNotificationReceiver extends BroadcastReceiver {
         PowerManager pm = (PowerManager) context.getSystemService(POWER_SERVICE);
         boolean autoLaunch = options.isAutoLaunchingApp() && SDK_INT <= P && !options.useFullScreenIntent();
 
-        // Check device sleep status here (not after wake)
-        // If device is asleep in this moment, waking it up with our wakelock
-        // is not enough to allow the app to have CPU to trigger an event
-        // in Android 8+.  Limitations on CPU can also occur when the app is in the background,
-        // so prevent that as well.
-        boolean canTriggerInApp = SDK_INT < O ||
-            (pm != null && pm.isInteractive() && checkAppInForeground());
         int badge = options.getBadgeNumber();
 
         if (badge > 0) {
@@ -67,8 +60,7 @@ abstract public class AbstractNotificationReceiver extends BroadcastReceiver {
         //   2.  Any SDK >= Oreo is asleep (must be triggered here)
         boolean didShowNotification = false;
         if (!options.triggerInApp() ||
-            (!autoLaunch && !checkAppRunning())
-            || !canTriggerInApp
+            (!autoLaunch && !checkAppRunning())            
         ) {
             didShowNotification = true;
             notification.show();
@@ -131,8 +123,6 @@ abstract public class AbstractNotificationReceiver extends BroadcastReceiver {
      * @return whether or not app is running
      */
     abstract public boolean checkAppRunning();
-
-    abstract public boolean checkAppInForeground();
 
     /**
      * Wakeup the device.
